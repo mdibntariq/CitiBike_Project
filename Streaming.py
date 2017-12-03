@@ -5,6 +5,7 @@ from pyspark import SparkContext
 from pyspark.streaming import StreamingContext
 from time import localtime, strftime
 from pyspark.sql import SQLContext
+from pyspark.sql.types import StructType,StructField,StringType,DateType,IntegerType,LongType
 
 import urllib
 import json
@@ -55,6 +56,10 @@ for index, row in pdf_system_alerts.iterrows():
     else:
         for val in row.station_ids[:]:
             new_pdf_system_alerts.loc[len(new_pdf_system_alerts)]=[row['alert_id'],row['last_updated'],val,row['summary'],row['type']]
+
+            
+schema_system_alerts = StructType([StructField("alert_id", LongType(), True), StructField("last_updated", LongType(), False), StructField("station_id", StringType(), False), StructField("summary", StringType(), False), StructField("type", StringType(), False)])            
+sqldf_system_alerts = sqlContext.createDataFrame([],schema_system_alerts)
 
 #Changing Pandas DF to SQL for aggregation 
 sqldf_station_info=sqlContext.createDataFrame(pdf_station_info)   
